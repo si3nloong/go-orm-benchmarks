@@ -21,7 +21,7 @@ func (m *Model) TableName() string {
 	return "models"
 }
 
-func (m *Model) Table() string {
+func (m Model) Table() string {
 	return "models"
 }
 

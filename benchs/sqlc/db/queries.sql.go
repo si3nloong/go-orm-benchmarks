@@ -2,18 +2,18 @@
 // versions:
 //   sqlc v1.13.0
 // source: queries.sql
-
 package db
 
 import (
 	"context"
 )
 
-const createModel = `-- name: CreateModel :one
-INSERT INTO models (NAME, title, fax, web, age, "right", counter)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
-RETURNING id, name, title, fax, web, age, "right", counter
-`
+// const createModel = `-- name: CreateModel :one
+// INSERT INTO models (NAME, title, fax, web, age, "right", counter)
+// VALUES ($1, $2, $3, $4, $5, $6, $7)
+// RETURNING id, name, title, fax, web, age, "right", counter
+// `
+const createModel = "INSERT INTO models (NAME, title, fax, web, age, `right`, counter) VALUES (?, ?, ?, ?, ?, ?, ?)"
 
 type CreateModelParams struct {
 	Name    string
@@ -25,8 +25,32 @@ type CreateModelParams struct {
 	Counter int64
 }
 
+// func (q *Queries) CreateModel(ctx context.Context, arg CreateModelParams) (Model, error) {
+// 	row := q.db.QueryRowContext(ctx, createModel,
+// 		arg.Name,
+// 		arg.Title,
+// 		arg.Fax,
+// 		arg.Web,
+// 		arg.Age,
+// 		arg.Right,
+// 		arg.Counter,
+// 	)
+// 	var i Model
+// 	err := row.Scan(
+// 		&i.ID,
+// 		&i.Name,
+// 		&i.Title,
+// 		&i.Fax,
+// 		&i.Web,
+// 		&i.Age,
+// 		&i.Right,
+// 		&i.Counter,
+// 	)
+// 	return i, err
+// }
+
 func (q *Queries) CreateModel(ctx context.Context, arg CreateModelParams) (Model, error) {
-	row := q.db.QueryRowContext(ctx, createModel,
+	result, err := q.db.ExecContext(ctx, createModel,
 		arg.Name,
 		arg.Title,
 		arg.Fax,
@@ -35,25 +59,28 @@ func (q *Queries) CreateModel(ctx context.Context, arg CreateModelParams) (Model
 		arg.Right,
 		arg.Counter,
 	)
+	if err != nil {
+		return Model{}, err
+	}
+	i64, _ := result.LastInsertId()
 	var i Model
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Title,
-		&i.Fax,
-		&i.Web,
-		&i.Age,
-		&i.Right,
-		&i.Counter,
-	)
+	i.ID = int32(i64)
+	i.Name = arg.Name
+	i.Title = arg.Title
+	i.Fax = arg.Fax
+	i.Web = arg.Web
+	i.Age = arg.Age
+	i.Right = arg.Right
+	i.Counter = arg.Counter
 	return i, err
 }
 
-const getModel = `-- name: GetModel :one
-SELECT id, name, title, fax, web, age, "right", counter
-FROM models
-WHERE id = $1
-`
+// const getModel = `-- name: GetModel :one
+// SELECT id, name, title, fax, web, age, "right", counter
+// FROM models
+// WHERE id = $1
+// `
+const getModel = "SELECT id, name, title, fax, web, age, `right`, counter FROM models WHERE id = ?"
 
 func (q *Queries) GetModel(ctx context.Context, id int32) (Model, error) {
 	row := q.db.QueryRowContext(ctx, getModel, id)
@@ -71,13 +98,14 @@ func (q *Queries) GetModel(ctx context.Context, id int32) (Model, error) {
 	return i, err
 }
 
-const listModels = `-- name: ListModels :many
-SELECT id, name, title, fax, web, age, "right", counter
-FROM models
-WHERE ID > $1
-ORDER BY ID
-LIMIT $2
-`
+// const listModels = `-- name: ListModels :many
+// SELECT id, name, title, fax, web, age, "right", counter
+// FROM models
+// WHERE ID > $1
+// ORDER BY ID
+// LIMIT $2
+// `
+const listModels = "SELECT id, name, title, fax, web, age, `right`, counter FROM models WHERE ID > ? ORDER BY ID LIMIT ?"
 
 type ListModelsParams struct {
 	ID    int32
@@ -116,16 +144,27 @@ func (q *Queries) ListModels(ctx context.Context, arg ListModelsParams) ([]Model
 	return items, nil
 }
 
+// const updateModel = `-- name: UpdateModel :exec
+// UPDATE models
+// SET name = $1,
+//     title = $2,
+//     fax = $3,
+//     web = $4,
+//     age = $5,
+//     "right" = $6,
+//     counter = $7
+// WHERE id = $8
+// `
 const updateModel = `-- name: UpdateModel :exec
 UPDATE models
-SET name = $1,
-    title = $2,
-    fax = $3,
-    web = $4,
-    age = $5,
-    "right" = $6,
-    counter = $7
-WHERE id = $8
+SET name = ?,
+    title = ?,
+    fax = ?,
+    web = ?,
+    age = ?,
+    `+"`right`"+` = ?,
+    counter = ?
+WHERE id = ?
 `
 
 type UpdateModelParams struct {

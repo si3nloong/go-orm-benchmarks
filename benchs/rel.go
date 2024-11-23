@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/go-rel/postgres"
+	"github.com/go-rel/mysql"
 	relware "github.com/go-rel/rel"
 	"github.com/go-rel/rel/where"
 )
@@ -20,7 +20,7 @@ func init() {
 		st.AddBenchmark("Read", 200*OrmMulti, RelRead)
 		st.AddBenchmark("MultiRead limit 100", 200*OrmMulti, RelReadSlice)
 
-		conn, err := postgres.Open(OrmSource)
+		conn, err := mysql.Open(ConvertSourceToDSN())
 		if err != nil {
 			log.Fatalf("failed opening connection to postgres: %v", err)
 		}

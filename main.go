@@ -10,6 +10,7 @@ import (
 
 	"github.com/efectn/go-orm-benchmarks/benchs"
 
+	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 )
 

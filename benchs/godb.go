@@ -3,7 +3,7 @@ package benchs
 import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 	godbware "github.com/samonzeweb/godb"
-	"github.com/samonzeweb/godb/adapters/postgresql"
+	"github.com/samonzeweb/godb/adapters/mysql"
 )
 
 var godb *godbware.DB
@@ -18,7 +18,7 @@ func init() {
 		st.AddBenchmark("MultiRead limit 100", 200*OrmMulti, GodbReadSlice)
 
 		var err error
-		godb, err = godbware.Open(postgresql.Adapter, OrmSource)
+		godb, err = godbware.Open(mysql.Adapter, ConvertSourceToDSN())
 		CheckErr(err)
 	}
 }

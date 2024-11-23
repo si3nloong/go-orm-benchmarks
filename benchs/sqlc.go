@@ -20,7 +20,7 @@ func init() {
 		st.AddBenchmark("Read", 200*OrmMulti, SqlcRead)
 		st.AddBenchmark("MultiRead limit 100", 200*OrmMulti, SqlcReadSlice)
 
-		dbConnection, _ := sql.Open("pgx", OrmSource)
+		dbConnection, _ := sql.Open(sqlDriver, ConvertSourceToDSN())
 		sqlcQueries = db.New(dbConnection)
 	}
 }

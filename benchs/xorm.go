@@ -15,7 +15,7 @@ func init() {
 		st.AddBenchmark("Read", 200*OrmMulti, XormRead)
 		st.AddBenchmark("MultiRead limit 100", 200*OrmMulti, XormReadSlice)
 
-		engine, err := xorm.NewEngine("postgres", OrmSource)
+		engine, err := xorm.NewEngine(sqlDriver, ConvertSourceToDSN())
 		CheckErr(err)
 
 		xo = engine.NewSession()
@@ -30,7 +30,7 @@ func XormInsert(b *B) {
 	})
 
 	for i := 0; i < b.N; i++ {
-		m.ID = 0
+		m.Id = 0
 		_, err := xo.Insert(m)
 		CheckErr(err, b)
 	}
@@ -62,7 +62,7 @@ func XormUpdate(b *B) {
 	})
 
 	for i := 0; i < b.N; i++ {
-		_, err := xo.ID(m.ID).Update(m)
+		_, err := xo.ID(m.Id).Update(m)
 		CheckErr(err, b)
 	}
 }
@@ -88,7 +88,7 @@ func XormReadSlice(b *B) {
 		InitDB()
 		m = NewModel5()
 		for i := 0; i < 100; i++ {
-			m.ID = 0
+			m.Id = 0
 			_, err := xo.Insert(m)
 			CheckErr(err, b)
 		}

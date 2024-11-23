@@ -20,7 +20,8 @@ func init() {
 
 		var err error
 		pop, err = popware.NewConnection(&popware.ConnectionDetails{
-			URL: ConvertSourceToDSN(),
+			Dialect: sqlDriver,
+			URL:     ConvertSourceToDSN(),
 		})
 		CheckErr(err)
 

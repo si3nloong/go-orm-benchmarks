@@ -32,6 +32,9 @@ func ConvertSourceToDSN() string {
 		}
 	}
 
+	// log.Println("ConvertSourceToDSN =>", ConvertSourceToDSN())
+
+	template = "root:abcd1234@/go-orm?parseTime=true&multiStatements=true"
 	return template
 }
 
@@ -66,37 +69,38 @@ func WrapExecute(b *B, cbk func()) {
 }
 
 func InitDB() {
-	sqls := [][]string{
-		{
-			`DROP TABLE IF EXISTS models;`,
-			`CREATE TABLE models (
-			id SERIAL NOT NULL,
-			name text NOT NULL,
-			title text NOT NULL,
-			fax text NOT NULL,
-			web text NOT NULL,
-			age integer NOT NULL,
-			"right" boolean NOT NULL,
-			counter bigint NOT NULL,
-			CONSTRAINT models_pkey PRIMARY KEY (id)
-			) WITH (OIDS=FALSE);`,
-		},
-		{
-			`DROP TABLE IF EXISTS model5;`,
-			`CREATE TABLE model5 (
-			id SERIAL NOT NULL,
-			name text NOT NULL,
-			title text NOT NULL,
-			fax text NOT NULL,
-			web text NOT NULL,
-			age integer NOT NULL,
-			"right" boolean NOT NULL,
-			counter bigint NOT NULL
-			) WITH (OIDS=FALSE);`,
-		},
-	}
+	// sqls := [][]string{
+	// 	{
+	// 		`DROP TABLE IF EXISTS models;`,
+	// 		`CREATE TABLE models (
+	// 		id SERIAL NOT NULL,
+	// 		name text NOT NULL,
+	// 		title text NOT NULL,
+	// 		fax text NOT NULL,
+	// 		web text NOT NULL,
+	// 		age integer NOT NULL,
+	// 		"right" boolean NOT NULL,
+	// 		counter bigint NOT NULL,
+	// 		CONSTRAINT models_pkey PRIMARY KEY (id)
+	// 		) WITH (OIDS=FALSE);`,
+	// 	},
+	// 	{
+	// 		`DROP TABLE IF EXISTS model5;`,
+	// 		`CREATE TABLE model5 (
+	// 		id SERIAL NOT NULL,
+	// 		name text NOT NULL,
+	// 		title text NOT NULL,
+	// 		fax text NOT NULL,
+	// 		web text NOT NULL,
+	// 		age integer NOT NULL,
+	// 		"right" boolean NOT NULL,
+	// 		counter bigint NOT NULL
+	// 		) WITH (OIDS=FALSE);`,
+	// 	},
+	// }
 
-	DB, err := sql.Open("pgx", OrmSource)
+	// DB, err := sql.Open("pgx", OrmSource)
+	DB, err := sql.Open("mysql", "root:abcd1234@/go-orm?parseTime=true")
 	CheckErr(err)
 	defer func() {
 		err := DB.Close()
@@ -106,11 +110,13 @@ func InitDB() {
 	err = DB.Ping()
 	CheckErr(err)
 
-	for _, sql := range sqls {
-		for _, line := range sql {
-			_, err = DB.Exec(line)
-			CheckErr(err)
-		}
-	}
+	// db.Migrate[Model](ctx, DB)
+	// db.Migrate[Model5](ctx, DB)
+	// for _, sql := range sqls {
+	// 	for _, line := range sql {
+	// 		_, err = DB.Exec(line)
+	// 		CheckErr(err)
+	// 	}
+	// }
 
 }

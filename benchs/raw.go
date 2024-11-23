@@ -2,18 +2,22 @@ package benchs
 
 import (
 	"database/sql"
-	"strconv"
 )
 
 var raw *sql.DB
 
 const (
-	rawInsertBaseSQL   = `INSERT INTO models (name, title, fax, web, age, "right", counter) VALUES `
-	rawInsertValuesSQL = `($1, $2, $3, $4, $5, $6, $7)`
+	// rawInsertBaseSQL = `INSERT INTO models (name, title, fax, web, age, "right", counter) VALUES `
+	rawInsertBaseSQL = "INSERT INTO models (name, title, fax, web, age, `right`, counter) VALUES "
+	// rawInsertValuesSQL = `($1, $2, $3, $4, $5, $6, $7)`
+	rawInsertValuesSQL = `(?, ?, ?, ?, ?, ?, ?)`
 	rawInsertSQL       = rawInsertBaseSQL + rawInsertValuesSQL
-	rawUpdateSQL       = `UPDATE models SET name = $1, title = $2, fax = $3, web = $4, age = $5, "right" = $6, counter = $7 WHERE id = $8`
-	rawSelectSQL       = `SELECT id, name, title, fax, web, age, "right", counter FROM models WHERE id = $1`
-	rawSelectMultiSQL  = `SELECT id, name, title, fax, web, age, "right", counter FROM models WHERE id > 0 LIMIT 100`
+	// rawUpdateSQL       = `UPDATE models SET name = $1, title = $2, fax = $3, web = $4, age = $5, "right" = $6, counter = $7 WHERE id = $8`
+	rawUpdateSQL = "UPDATE models SET name = ?, title = ?, fax = ?, web = ?, age = ?, `right` = ?, counter = ? WHERE id = ?"
+	// rawSelectSQL       = `SELECT id, name, title, fax, web, age, "right", counter FROM models WHERE id = $1`
+	rawSelectSQL = "SELECT id, name, title, fax, web, age, `right`, counter FROM models WHERE id = ?"
+	// rawSelectMultiSQL = `SELECT id, name, title, fax, web, age, "right", counter FROM models WHERE id > 0 LIMIT 100`
+	rawSelectMultiSQL = "SELECT id, name, title, fax, web, age, `right`, counter FROM models WHERE id > 0 LIMIT 100"
 )
 
 func init() {
@@ -25,7 +29,7 @@ func init() {
 		st.AddBenchmark("Read", 200*OrmMulti, RawRead)
 		st.AddBenchmark("MultiRead limit 100", 200*OrmMulti, RawReadSlice)
 
-		raw, _ = sql.Open("pgx", OrmSource)
+		raw, _ = sql.Open("mysql", ConvertSourceToDSN())
 	}
 }
 
@@ -38,8 +42,10 @@ func RawInsert(b *B) {
 
 	for i := 0; i < b.N; i++ {
 		// pq dose not support the LastInsertId method.
-		_, err := raw.Exec(rawInsertSQL, m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter)
+		result, err := raw.Exec(rawInsertSQL, m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter)
 		CheckErr(err, b)
+		id, _ := result.LastInsertId()
+		m.Id = int(id)
 	}
 }
 
@@ -67,10 +73,15 @@ func RawInsertMulti(b *B) {
 	for i := 0; i < 100; i++ {
 		hoge := ""
 		for j := 0; j < 7; j++ {
+			// if j != 6 {
+			// 	hoge += "$" + strconv.Itoa(counter) + ","
+			// } else {
+			// 	hoge += "$" + strconv.Itoa(counter)
+			// }
 			if j != 6 {
-				hoge += "$" + strconv.Itoa(counter) + ","
+				hoge += "?,"
 			} else {
-				hoge += "$" + strconv.Itoa(counter)
+				hoge += "?"
 			}
 			counter++
 

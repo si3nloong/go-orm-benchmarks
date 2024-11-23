@@ -1,7 +1,7 @@
 package benchs
 
 import (
-	"gorm.io/driver/postgres"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -18,9 +18,9 @@ func init() {
 		st.AddBenchmark("MultiRead limit 100", 200*OrmMulti, GormReadSlice)
 
 		var err error
-		gormdb, err = gorm.Open(postgres.New(postgres.Config{
-			DSN:                  OrmSource,
-			PreferSimpleProtocol: true, // disables implicit prepared statement usage
+		gormdb, err = gorm.Open(mysql.New(mysql.Config{
+			DSN: ConvertSourceToDSN(),
+			// PreferSimpleProtocol: true, // disables implicit prepared statement usage
 		}), &gorm.Config{
 			SkipDefaultTransaction: true,
 			PrepareStmt:            false,

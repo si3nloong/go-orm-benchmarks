@@ -7,7 +7,6 @@ import (
 	entsql "entgo.io/ent/dialect/sql"
 	"github.com/efectn/go-orm-benchmarks/benchs/ent"
 	"github.com/efectn/go-orm-benchmarks/benchs/ent/model"
-	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
 var client *ent.Client
@@ -32,11 +31,11 @@ func init() {
 		st.AddBenchmark("MultiRead limit 100", 200*OrmMulti, EntReadSlice)
 
 		var err error
-		dbEnt, err = sql.Open("pgx", OrmSource)
+		dbEnt, err = sql.Open("mysql", ConvertSourceToDSN())
 		CheckErr(err)
 
 		// Create an ent.Driver from `dbEnt`.
-		drv := entsql.OpenDB(dialect.Postgres, dbEnt)
+		drv := entsql.OpenDB(dialect.MySQL, dbEnt)
 
 		// Assign to client
 		client = ent.NewClient(ent.Driver(drv))

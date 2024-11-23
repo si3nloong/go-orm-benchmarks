@@ -7,7 +7,7 @@ import (
 
 // Model for GORM, GORP, Beego, Bun, Pg, Raw, Sqlc, Ent
 type Model struct {
-	Id      int `orm:"auto" gorm:"primary_key" db:"id" bun:",pk,autoincrement"`
+	Id      int `orm:"auto" gorm:"primary_key" db:"id" bun:",pk,autoincrement" sql:",pk,auto_increment"`
 	Name    string
 	Title   string
 	Fax     string
@@ -15,10 +15,6 @@ type Model struct {
 	Age     int
 	Right   bool
 	Counter int64
-}
-
-func (m *Model) TableName() string {
-	return "models"
 }
 
 func (m Model) Table() string {
@@ -63,7 +59,7 @@ type Model2 struct {
 	Counter int64  `db:"counter"`
 }
 
-func (*Model2) TableName() string {
+func (Model2) TableName() string {
 	return "models"
 }
 
@@ -140,7 +136,7 @@ func NewModel4() *Model4 {
 
 // Model for XORM
 type Model5 struct {
-	ID      int `xorm:"pk autoincr 'id'"`
+	Id      int64 `xorm:"pk"`
 	Name    string
 	Title   string
 	Fax     string
@@ -159,7 +155,6 @@ func NewModel5() *Model5 {
 	m.Age = 100
 	m.Right = true
 	m.Counter = 1000
-
 	return m
 }
 

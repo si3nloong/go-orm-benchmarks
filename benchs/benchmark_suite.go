@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+const sqlDriver = "mysql"
+
 type BenchmarkResult struct {
 	N         int
 	T         time.Duration
@@ -223,7 +225,8 @@ func (s BList) Less(i, j int) bool {
 	if s[j].failed {
 		return true
 	}
-	return s[i].duration < s[j].duration
+	// return s[i].netBytes*s[i].netAllocs*uint64(s[i].result.N) < s[j].netBytes*s[j].netAllocs*uint64(s[j].result.N)
+	return (s[i].duration) < (s[j].duration)
 }
 
 func MakeReport() (result string) {
